@@ -13,11 +13,11 @@ function secondsToMilliseconds(seconds) {
   return seconds * 1000;
 }
 
-function speak(text) {
-  const synth = window.speechSynthesis;
+function speak(text, voice) {
   const utterance = new SpeechSynthesisUtterance();
   utterance.text = text;
-  synth.speak(utterance);
+  utterance.voice = getVoiceByGender(voice);
+  window.speechSynthesis.speak(utterance);
 }
 
 document.getElementById('playBtn').addEventListener('click', function() {
@@ -26,6 +26,7 @@ document.getElementById('playBtn').addEventListener('click', function() {
     .then(text => {
       const lines = text.split('\n');
       let index = 0;
+      const synth = window.speechSynthesis; // Move the definition of synth here
 
       function playNextLine() {
         if (index < lines.length) {
@@ -40,22 +41,11 @@ document.getElementById('playBtn').addEventListener('click', function() {
             voice = 'female';
           }
 
-          const utterance = new SpeechSynthesisUtterance();
-          utterance.text = line;
-          utterance.voice = getVoiceByGender(voice);
-
           if (line.startsWith('/pause')) {
             const pauseTime = parseInt(line.split(' ')[1]);
             setTimeout(playNextLine, secondsToMilliseconds(pauseTime));
-          } else if (line.startsWith('/music')) {
-            const musicFileName = line.split(' ')[1];
-            const audio = new Audio(musicFileName);
-            audio.play().onended = function() {
-              index++;
-              playNextLine();
-            };
           } else {
-            synth.speak(utterance);
+            speak(line, voice);
             index++;
             setTimeout(playNextLine, secondsToMilliseconds(2));
           }
@@ -71,6 +61,7 @@ document.getElementById('playBtn').addEventListener('click', function() {
     })
     .catch(error => console.error(error));
 });
+
 
   </script>
 </body>
