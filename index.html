@@ -1,1 +1,77 @@
-radio test
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Radio Station</title>
+</head>
+<body>
+  <h1>Radio Station</h1>
+  <button id="playBtn">Play</button>
+  <div id="content"></div>
+
+  <script>
+function secondsToMilliseconds(seconds) {
+  return seconds * 1000;
+}
+
+function speak(text) {
+  const synth = window.speechSynthesis;
+  const utterance = new SpeechSynthesisUtterance();
+  utterance.text = text;
+  synth.speak(utterance);
+}
+
+document.getElementById('playBtn').addEventListener('click', function() {
+  fetch('radio_station.txt')
+    .then(response => response.text())
+    .then(text => {
+      const lines = text.split('\n');
+      let index = 0;
+
+      function playNextLine() {
+        if (index < lines.length) {
+          let line = lines[index].trim();
+          let voice = 'default';
+
+          if (line.startsWith('Male:')) {
+            line = line.substring(5).trim();
+            voice = 'male';
+          } else if (line.startsWith('Female:')) {
+            line = line.substring(7).trim();
+            voice = 'female';
+          }
+
+          const utterance = new SpeechSynthesisUtterance();
+          utterance.text = line;
+          utterance.voice = getVoiceByGender(voice);
+
+          if (line.startsWith('/pause')) {
+            const pauseTime = parseInt(line.split(' ')[1]);
+            setTimeout(playNextLine, secondsToMilliseconds(pauseTime));
+          } else if (line.startsWith('/music')) {
+            const musicFileName = line.split(' ')[1];
+            const audio = new Audio(musicFileName);
+            audio.play().onended = function() {
+              index++;
+              playNextLine();
+            };
+          } else {
+            synth.speak(utterance);
+            index++;
+            setTimeout(playNextLine, secondsToMilliseconds(2));
+          }
+        }
+      }
+
+      function getVoiceByGender(gender) {
+        const voices = window.speechSynthesis.getVoices();
+        return voices.find(voice => voice.name.includes(gender));
+      }
+
+      playNextLine();
+    })
+    .catch(error => console.error(error));
+});
+
+  </script>
+</body>
+</html>
