@@ -1,0 +1,12 @@
+Male: Welcome to Awesome Radio!
+Male: Get ready for some amazing tunes.
+/pause 3
+Female: Our first song for the day is "Happy" by Pharrell Williams.
+/pause 2
+Male: We hope this song brings a smile to your face.
+/pause 3
+Male: Remember to stay tuned for more great music and shows.
+/pause 2
+Female: Up next, we have "Shape of You" by Ed Sheeran.
+/pause 2
+Male: Enjoy the music and have a fantastic day!
